@@ -50,6 +50,27 @@ dgm_binary_categorical_covariate <- function(sample_size, total_T) {
     return(dta)
 }
 
+# Intermediate function
+# Takes in the dataset created by dgm_binary_categorical_covariate() and updates prob_Y to reflect trajectory
+# Regenerates outcome based on new values of prob_Y
+dgm_update <- function(dat, gam) {
+  dat <- dat %>%
+    group_by(userid) %>%
+    mutate(delta = (NA^!cummax(A)) * sequence(table(cumsum(A)))-1) %>%
+    ungroup() %>%
+    mutate(prob_Y_trajectory = ifelse(A == 1 | is.na(delta), prob_Y, prob_Y_A0 * exp((1 / (gam*(delta + 1))) * (beta_0 + beta_1*S))))
+  
+  dat$Y_trajectory <- rbinom(nrow(dat), 1, dat$prob_Y_trajectory)
+  return(dat)
+}
+
+# Creates output dataset with a trajectory
+dgm_trajectory <- function(sample_size, total_T, gam = 1) {
+  orig_dat <- dgm_binary_categorical_covariate(sample_size, total_T)
+  new_dat <- dgm_update(orig_dat, gam)
+  return(new_dat)
+}
+
 ## true beta for (Intercept, S)
 beta_true <- c(0.1, 0.3)
 
