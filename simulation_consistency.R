@@ -76,7 +76,7 @@ for (i_ss in 1:length(sample_sizes)) {
     sample_size <- sample_sizes[i_ss]
     
     writeLines(c(""), "~/Downloads/log.txt")
-    sink("~/Downloads/log.txt", append=FALSE)
+    #sink("~/Downloads/log.txt", append=FALSE)
     result <- foreach(isim = 1:nsim, .combine = "c") %dorng% {
         if (isim %% 10 == 0) {
             cat(paste("Starting iteration",isim,"\n"))
@@ -146,7 +146,7 @@ for (i_ss in 1:length(sample_sizes)) {
         
         output <- list(list(fit_wcls = fit_wcls, fit_eif = fit_eif, fit_eif_modified = fit_eif_modified, fit_gee_ind = fit_gee_ind, fit_gee_exch = fit_gee_exch))
     }
-    sink()
+    #sink()
     
     ee_names <- c("wcls", "eif", "eif_modified", "gee_ind", "gee_exch")
     alpha_names <- c("Intercept", control_vars)
@@ -204,13 +204,13 @@ result_df_collected$rmse <- round(result_df_collected$rmse, 3)
 result_df_collected$cp.unadj <- round(result_df_collected$cp.unadj, 2)
 result_df_collected$cp.adj <- round(result_df_collected$cp.adj, 2)
 
-sink("table_generation/simulation_1.txt", append=FALSE)
+#sink("table_generation/simulation_1.txt", append=FALSE)
 mycaption <- "caption for simulation 1"
 latex_code <- kable(result_df_collected, format = "latex", booktabs = T, align = "c", caption = mycaption) %>%
     # add_header_above(c("est", "sample.size", "bias", "sd", "rmse", "cp.unadj", "cp.adj")) %>%
     # column_spec(1, bold=T) %>%
     collapse_rows(columns = 1, latex_hline = "major")
 print(latex_code)
-sink()
+#sink()
 
 # then run replace_text-boot.py to replace certain text in the output table
