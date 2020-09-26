@@ -56,9 +56,9 @@ dgm_binary_categorical_covariate <- function(sample_size, total_T) {
 dgm_update <- function(dat, gam) {
   dat <- dat %>%
     group_by(userid) %>%
-    mutate(delta = (NA^!cummax(A)) * sequence(table(cumsum(A)))-1) %>%
+    mutate(delta = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
     ungroup() %>%
-    mutate(prob_Y_trajectory = ifelse(A == 1 | is.na(delta), prob_Y, prob_Y_A0 * exp((1 / (gam*(delta + 1))) * (beta_0 + beta_1*S))))
+    mutate(prob_Y_trajectory = ifelse(A == 1 | is.na(delta), prob_Y, prob_Y_A0 * exp((1 / (gam*delta)) * (beta_0 + beta_1*S))))
   
   dat$Y_trajectory <- rbinom(nrow(dat), 1, dat$prob_Y_trajectory)
   return(dat)
