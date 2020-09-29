@@ -9,6 +9,7 @@
 # and the log linear GEE is biased for beta.
 
 library(tidyverse)
+library(zoo) # to compute rolling sum, used in creation of delta-treatment indicator variable
 
 expit <- function(x){
     return(exp(x)/(1+exp(x)))
@@ -55,24 +56,26 @@ dgm_binary_categorical_covariate <- function(sample_size, total_T) {
 # Intermediate function
 # Takes in the dataset created by dgm_binary_categorical_covariate() and updates prob_Y to reflect trajectory
 # Regenerates outcome based on new values of prob_Y
-dgm_update <- function(dat, gam) {
+dgm_update <- function(dat, del, gam) {
   beta_0 <- 0.1
   beta_1 <- 0.3
   
   dat <- dat %>%
     group_by(userid) %>%
-    mutate(delta = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
+    mutate(d = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
+    mutate(indicator_del_trt = if(del == 1) {1} else {+(dplyr::lead(zoo::rollsum(A, del - 1, fill = NA, align = "left")) == 0)}) %>%
     ungroup() %>%
-    mutate(prob_Y_trajectory = ifelse(A == 1 | is.na(delta), prob_Y, prob_Y_A0 * exp((1 / (gam*delta)) * (beta_0 + beta_1*S))))
+    mutate(importance = indicator_del_trt * (1 / (1 - prob_A))^(del - 1)) %>%
+    mutate(prob_Y_trajectory = ifelse(A == 1 | is.na(d), prob_Y, prob_Y_A0 * exp((1 / (gam*d)) * (beta_0 + beta_1*S))))
   
   dat$Y_trajectory <- rbinom(nrow(dat), 1, dat$prob_Y_trajectory)
   return(dat)
 }
 
 # Creates output dataset with a trajectory
-dgm_trajectory <- function(sample_size, total_T, gam = 1) {
+dgm_trajectory <- function(sample_size, total_T, del, gam = 1) {
   orig_dat <- dgm_binary_categorical_covariate(sample_size, total_T)
-  new_dat <- dgm_update(orig_dat, gam)
+  new_dat <- dgm_update(orig_dat, del, gam)
   return(new_dat)
 }
 
