@@ -8,6 +8,8 @@
 # S_t (covariate) takes 3 values
 # and the log linear GEE is biased for beta.
 
+library(tidyverse)
+
 expit <- function(x){
     return(exp(x)/(1+exp(x)))
 }
@@ -54,6 +56,9 @@ dgm_binary_categorical_covariate <- function(sample_size, total_T) {
 # Takes in the dataset created by dgm_binary_categorical_covariate() and updates prob_Y to reflect trajectory
 # Regenerates outcome based on new values of prob_Y
 dgm_update <- function(dat, gam) {
+  beta_0 <- 0.1
+  beta_1 <- 0.3
+  
   dat <- dat %>%
     group_by(userid) %>%
     mutate(delta = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
