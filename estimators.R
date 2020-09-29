@@ -812,6 +812,7 @@ weighted_centered_least_square <- function(
     treatment_varname,
     outcome_varname,
     control_varname,
+    importance_varname,
     moderator_varname,
     rand_prob_varname,
     avail_varname = NULL,
@@ -888,6 +889,7 @@ weighted_centered_least_square <- function(
     A[avail == 0] <- 0
     
     p_t <- dta[, rand_prob_varname]
+    imp_t <- dta[, importance_varname]
     cA <- A - p_t # centered A
     Y <- dta[, outcome_varname]
     Xdm <- as.matrix( cbind( rep(1, nrow(dta)), dta[, moderator_varname] ) ) # X (moderator) design matrix, intercept added
@@ -908,7 +910,7 @@ weighted_centered_least_square <- function(
     }
     cA_tilde <- A - p_t_tilde
     
-    WCLS_weight <- ifelse(A, p_t_tilde / p_t, (1 - p_t_tilde) / (1 - p_t))
+    WCLS_weight <- ifelse(A, p_t_tilde / p_t, (1 - p_t_tilde) / (1 - p_t)) * imp_t
     
     p <- length(moderator_varname) + 1 # dimension of beta
     q <- length(control_varname) + 1 # dimension of alpha
