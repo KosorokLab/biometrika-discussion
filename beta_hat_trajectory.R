@@ -14,6 +14,7 @@ beta_hats <- matrix(nrow = delta, ncol = 2, data = NA)
 colnames(beta_hats) <- c("intercept", "slope")
 
 for (i in 1:delta) {
+  print(paste0("Delta: ", i))
   dta_delta <- as.data.frame(dgm_delta(dta_updated, del = i))
   fit <- weighted_centered_least_square(
     dta = dta_delta,
