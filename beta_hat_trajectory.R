@@ -1,13 +1,15 @@
+library(tidyverse)
+
 source("dgm_binary_categorical_covariate.R")
 source("estimators.R")
 
-set.seed(2020)
+set.seed(2022)
 
 control_vars <- "S"
 moderator_vars <- "S"
 delta <- 6
 
-dta_orig <- data_generating_process(500, 10)
+dta_orig <- data_generating_process(10000, 10)
 dta_updated <- dgm_update(dta_orig)
 
 beta_hats <- matrix(nrow = delta, ncol = 2, data = NA)
@@ -33,4 +35,9 @@ for (i in 1:delta) {
   beta_hats[i, ] <- fit$beta_hat
 }
 
+beta_hats <- as.data.frame(beta_hats)
+
 print(beta_hats)
+
+with(beta_hats, plot(intercept, slope))
+with(beta_hats, lines(intercept, slope))

@@ -22,7 +22,7 @@ dgm_binary_categorical_covariate <- function(sample_size, total_T) {
     baseline_Y_S1 <- 0.5
     baseline_Y_S2 <- 0.4
     
-    beta_0 <- 0.1
+    beta_0 <- -0.1
     beta_1 <- 0.3
     
     prob_a <- 0.2
@@ -56,7 +56,7 @@ dgm_binary_categorical_covariate <- function(sample_size, total_T) {
 # Takes in the dataset created by dgm_binary_categorical_covariate() and updates prob_Y to reflect trajectory
 # Regenerates outcome based on new values of prob_Y
 dgm_update <- function(dat, gam = 1) {
-  beta_0 <- 0.1
+  beta_0 <- -0.1
   beta_1 <- 0.3
   
   dat <- dat %>%
