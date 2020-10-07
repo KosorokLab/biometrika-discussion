@@ -22,7 +22,7 @@ dgm_binary_categorical_covariate <- function(sample_size, total_T) {
     baseline_Y_S1 <- 0.5
     baseline_Y_S2 <- 0.4
     
-    beta_0 <- -0.1
+    beta_0 <- -0.3
     beta_1 <- 0.3
     
     prob_a <- 0.2
@@ -56,14 +56,22 @@ dgm_binary_categorical_covariate <- function(sample_size, total_T) {
 # Takes in the dataset created by dgm_binary_categorical_covariate() and updates prob_Y to reflect trajectory
 # Regenerates outcome based on new values of prob_Y
 dgm_update <- function(dat, gam = 1) {
-  beta_0 <- -0.1
-  beta_1 <- 0.3
+  beta_0 <- -0.3 #unused at the moment
+  beta_1 <- 0.3 #unused at the moment
+  
+  # dat <- dat %>%
+  #   group_by(userid) %>%
+  #   mutate(d = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
+  #   ungroup() %>%
+  #   mutate(prob_Y_trajectory = ifelse(A == 1 | is.na(d), prob_Y, prob_Y_A0 * exp((1 / (gam*d)) * (beta_0 + beta_1*S))))
   
   dat <- dat %>%
     group_by(userid) %>%
     mutate(d = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
     ungroup() %>%
-    mutate(prob_Y_trajectory = ifelse(A == 1 | is.na(d), prob_Y, prob_Y_A0 * exp((1 / (gam*d)) * (beta_0 + beta_1*S))))
+    mutate(prob_Y_trajectory = ifelse(S==0, ifelse(is.na(d), expit(-2), expit(-2 - 1/d)),
+                                      ifelse(S==1, ifelse(is.na(d), expit(-1), expit(-1)), 
+                                             ifelse(S==2, ifelse(is.na(d), expit(-1.5), expit(-1.5 + 1/d)), NA))))
   
   dat$Y_trajectory <- rbinom(nrow(dat), 1, dat$prob_Y_trajectory)
   return(dat)
