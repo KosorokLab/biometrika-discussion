@@ -121,7 +121,7 @@ dgm_binary_continuous_covariate <- function(sample_size, total_T) {
     #                                    ifelse(dta$S[row_index] == 1, baseline_Y_S1, baseline_Y_S2))
     # dta$prob_Y[row_index] <- dta$prob_Y_A0[row_index] * exp(dta$A[row_index] * (beta_0 + beta_1 * dta$S[row_index]))
     dta$prob_Y_A0[row_index] <- expit(2 * sin(dta$S[row_index]*3))  # no attenuated effects assumed
-    dta$prob_Y[row_index] <- expit(2 * sin(dta$S[row_index]*3) + A * (1-dta$S[row_index]))  # no attenuated effects assumed
+    dta$prob_Y[row_index] <- expit(2 * sin(dta$S[row_index]*3) + dta$A[row_index] * (1-dta$S[row_index]))  # no attenuated effects assumed
     
     dta$Y[row_index] <- rbinom(sample_size, 1, dta$prob_Y[row_index])
   }
@@ -143,7 +143,7 @@ dgm_update_continuous_covariate <- function(dat, gam = 1) {
     mutate(d = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
     ungroup() %>%
     mutate(prob_Y_trajectory = 
-             expit(2 * sin(dta$S[row_index]*3) + (1-dta$S[row_index])/d))
+             expit(2 * sin(dat$S*3) + ifelse(is.na(d), 0, (1-dat$S)/d)))
              
   dat$Y_trajectory <- rbinom(nrow(dat), 1, dat$prob_Y_trajectory)
   return(dat)
@@ -162,7 +162,9 @@ alpha_true <- c(-1.6094379,  0.9162907, -1.1394343)
 # try out the range of Y
 if (0) {
     set.seed(123)
-    dta <- dgm_binary_two_covariate(100, 30)
+    # dta <- dgm_binary_two_covariate(100, 30)
+    dta <- dgm_binary_continuous_covariate(100, 30)
+    dgm_update_continuous_covariate(dta, 1)
     summary(dta$prob_Y)
     summary(dta$prob_A)
 }
