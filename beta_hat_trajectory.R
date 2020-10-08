@@ -1,4 +1,5 @@
 library(tidyverse)
+library(latex2exp)
 
 source("dgm_binary_categorical_covariate.R")
 source("estimators.R")
@@ -9,8 +10,11 @@ control_vars <- "S"
 moderator_vars <- "S"
 delta <- 6
 
-dta_orig <- dgm_binary_categorical_covariate(5000, 10)
-dta_updated <- dgm_update(dta_orig)
+#dta_orig <- dgm_binary_categorical_covariate(500, 10)
+#dta_updated <- dgm_update(dta_orig)
+
+dta_orig <- dgm_binary_continuous_covariate(500, 10)
+dta_updated <- dgm_update_continuous_covariate(dta_orig)
 
 beta_hats <- matrix(nrow = delta, ncol = 2, data = NA)
 colnames(beta_hats) <- c("intercept", "slope")
@@ -39,5 +43,19 @@ beta_hats <- as.data.frame(beta_hats)
 
 print(beta_hats)
 
-with(beta_hats, plot(intercept, slope))
-with(beta_hats, lines(intercept, slope))
+plot(beta_hats$intercept, beta_hats$slope,
+     xlab = TeX("$\\hat{\\beta}_0$"),
+     ylab = "",
+     ylim = c(min(beta_hats$slope)-.03, max(beta_hats$slope)+.08))
+title(main = TeX("Trajectory of $\\hat{\\beta}$"), line = 1.5)
+title(ylab = TeX("$\\hat{\\beta}_1$"), line = 2.5)
+lines(beta_hats$intercept, beta_hats$slope)
+text(x = beta_hats$intercept, y = beta_hats$slope+.05, labels = c(1, 2, 3, 4, 5, 6))
+
+rgl::plot3d(x = beta_hats$intercept,
+            y = beta_hats$slope, 
+            z = 1:delta, 
+            type = "s", 
+            xlab = TeX("$\\hat{\\beta}_0$"), 
+            ylab = TeX("$\\hat{\\beta}_1$"), 
+            zlab = TeX("Delta"))
