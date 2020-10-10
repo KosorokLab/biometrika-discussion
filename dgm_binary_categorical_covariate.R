@@ -137,21 +137,14 @@ dgm_binary_continuous_covariate <- function(sample_size, total_T) {
   return(dta)
 }
 dgm_update_continuous_covariate <- function(dat, gam = 1) {
-  beta_0 <- -0.3 #unused at the moment
-  beta_1 <- 0.3 #unused at the moment
-  
-  # dat <- dat %>%
-  #   group_by(userid) %>%
-  #   mutate(d = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
-  #   ungroup() %>%
-  #   mutate(prob_Y_trajectory = ifelse(A == 1 | is.na(d), prob_Y, prob_Y_A0 * exp((1 / (gam*d)) * (beta_0 + beta_1*S))))
+  # gam = attenuation factor. The bigger, the effects last longer.
   
   dat <- dat %>%
     group_by(userid) %>%
     mutate(d = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
     ungroup() %>%
     mutate(prob_Y_trajectory = 
-             expit(2 * sin(dat$S*3) + ifelse(is.na(d), 0, (1-dat$S)/d)))
+             expit(2 * sin(dat$S*3) + ifelse(is.na(d), 0, (1-dat$S)*d^(-1/gam))))
              
   dat$Y_trajectory <- rbinom(nrow(dat), 1, dat$prob_Y_trajectory)
   return(dat)
