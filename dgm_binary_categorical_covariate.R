@@ -79,12 +79,20 @@ dgm_update <- function(dat, gam = 1) {
 }
 
 dgm_delta <- function(dat, del) {
+  del1 = del - 1
   dat <- dat %>%
     group_by(userid) %>%
     mutate(indicator_del_trt = if(del == 1) {1} else {+(dplyr::lead(zoo::rollsum(A, del - 1, fill = NA, align = "left")) == 0)}) %>%
     ungroup() %>%
     mutate(indicator_del_trt = ifelse(is.na(indicator_del_trt), 0, indicator_del_trt)) %>%
     mutate(importance = indicator_del_trt * (1 / (1 - prob_A))^(del - 1))
+  if (del1)
+    dat <- # shifting the outcome by 'delta - 1'
+    dat %>% 
+    group_by(userid) %>% 
+    mutate(Y_trajectory = c(Y_trajectory[-(1:del1)], rep(NA, del1)),
+           prob_Y_trajectory = c(prob_Y_trajectory[-(1:del1)], rep(NA, del1))) %>% 
+    dplyr::filter(!is.na(Y_trajectory))
   return(dat)
 }
 
