@@ -154,10 +154,9 @@ dgm_binary_continuous_covariate <- function(sample_size, total_T) {
 
 dgm_update_continuous_covariate <- function(dat, gam = 1) {
   # gam = attenuation factor. The bigger, the effects last longer.
-  capT <- length(unique(dat$day))
   dat <- dat %>%
     group_by(userid) %>%
-    mutate(cumHaz = c(0, cumsum(A)[-capT])) %>%
+    mutate(cumHaz = cumsum(A)) %>%
     ungroup() %>%
     mutate(prob_Y_trajectory = 
              expit(2 * sin(dat$S*3) +  (2-dat$S)* cumHaz))
