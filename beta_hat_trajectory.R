@@ -4,8 +4,7 @@ library(latex2exp)
 source("dgm_binary_categorical_covariate.R")
 source("estimators.R")
 
-set.seed(2020)
-
+set.seed(7)
 control_vars <- "S"
 moderator_vars <- "S"
 delta <- 6
@@ -13,7 +12,7 @@ delta <- 6
 #dta_orig <- dgm_binary_categorical_covariate(500, 10)
 #dta_updated <- dgm_update(dta_orig)
 
-dta_orig <- dgm_binary_continuous_covariate(500, 10)
+dta_orig <- dgm_binary_continuous_covariate(1000, 10)
 dta_updated <- dgm_update_continuous_covariate(dta_orig)
 
 beta_hats <- matrix(nrow = delta, ncol = 2, data = NA)

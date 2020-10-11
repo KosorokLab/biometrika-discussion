@@ -85,13 +85,15 @@ dgm_delta <- function(dat, del) {
     mutate(indicator_del_trt = if(del == 1) {1} else {+(dplyr::lead(zoo::rollsum(A, del - 1, fill = NA, align = "left")) == 0)}) %>%
     ungroup() %>%
     mutate(indicator_del_trt = ifelse(is.na(indicator_del_trt), 0, indicator_del_trt)) %>%
-    mutate(importance = indicator_del_trt * (1 / (1 - prob_A))^(del - 1))
+    mutate(importance = indicator_del_trt * (1 / (1 - prob_A))^(del - 1)) # this code is valid only when probA is a constant.
   if (del1)
     dat <- # shifting the outcome by 'delta - 1'
     dat %>% 
     group_by(userid) %>% 
     mutate(Y_trajectory = c(Y_trajectory[-(1:del1)], rep(NA, del1)),
-           prob_Y_trajectory = c(prob_Y_trajectory[-(1:del1)], rep(NA, del1))) %>% 
+           prob_Y_trajectory = c(prob_Y_trajectory[-(1:del1)], rep(NA, del1)))
+  dat <- 
+    dat %>% 
     dplyr::filter(!is.na(Y_trajectory))
   return(dat)
 }
@@ -102,7 +104,7 @@ dgm_binary_continuous_covariate <- function(sample_size, total_T) {
   # beta_0 <- -0.3
   # beta_1 <- 0.3
   
-  prob_a <- 0.2
+  prob_a <- 0.1
   
   df_names <- c("userid", "day", "Y", "A", "S", "S2", "prob_Y", "prob_Y_A0", "prob_A")
   
@@ -136,20 +138,33 @@ dgm_binary_continuous_covariate <- function(sample_size, total_T) {
   
   return(dta)
 }
+# dgm_update_continuous_covariate <- function(dat, gam = 1) {
+#   # gam = attenuation factor. The bigger, the effects last longer.
+#   
+#   dat <- dat %>%
+#     group_by(userid) %>%
+#     mutate(d = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
+#     ungroup() %>%
+#     mutate(prob_Y_trajectory = 
+#              expit(2 * sin(dat$S*3) + ifelse(is.na(d), 0, (2-dat$S)/(1 + d))))
+#              
+#   dat$Y_trajectory <- rbinom(nrow(dat), 1, dat$prob_Y_trajectory)
+#   return(dat)
+# }
+
 dgm_update_continuous_covariate <- function(dat, gam = 1) {
   # gam = attenuation factor. The bigger, the effects last longer.
-  
+  capT <- length(unique(dat$day))
   dat <- dat %>%
     group_by(userid) %>%
-    mutate(d = (NA^!cummax(A)) * sequence(table(cumsum(A)))) %>%
+    mutate(cumHaz = c(0, cumsum(A)[-capT])) %>%
     ungroup() %>%
     mutate(prob_Y_trajectory = 
-             expit(2 * sin(dat$S*3) + ifelse(is.na(d), 0, (1-dat$S)*d^(-1/gam))))
-             
+             expit(2 * sin(dat$S*3) +  (2-dat$S)* cumHaz))
+  
   dat$Y_trajectory <- rbinom(nrow(dat), 1, dat$prob_Y_trajectory)
   return(dat)
 }
-
 
 ## true beta for (Intercept, S)
 beta_true <- c(0.1, 0.3)
