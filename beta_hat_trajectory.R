@@ -67,5 +67,17 @@ text(x = c(beta_hats$intercept[1:4], beta_hats$intercept[5]-.015, beta_hats$inte
 #            zlab = TeX("Delta"))
 
 dat <- read.table(text = "1   2   3   4   5   6
-1 1.464 1.638 3.460 295 670 360  190
-2 2.536 2.362 377 255 340 615  345", header = TRUE)
+1 1.464 1.638 3.460 1.890 3.090 3.960
+2 2.536 2.362 0.540 2.110 0.910 0.040", header = TRUE)
+
+delta <- c("1", "1", "2", "2", "3", "3", "4", "4", "5", "5", "6", "6")
+#type <- c(rep(c("Trt 1", "Trt 2"), 5), "Trt 1 last", "Trt 2 last")
+type <- c(rep(c("Trt 1", "Trt 2"), 6))
+value <- c(1.464, 2.536, 1.638, 2.362, 3.460, .540, 1.89, 2.11, 3.09, .91, 3.96, .04)
+dat <- data.frame(delta, type, value)
+
+ggplot(dat, aes(fill=type, y=value, x=delta)) + 
+  geom_bar(position="stack", stat="identity") +
+  xlab("Delta") +
+  ylab("Covariate S") +
+  labs(fill = "Optimal Treatment")
