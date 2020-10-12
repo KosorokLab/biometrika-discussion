@@ -96,7 +96,7 @@ p1 <-
   geom_point() +
   facet_grid(ifelse(contrast == "fixed",  "fixed sequences", "stochastic sequences") ~ Delta) +
   xlab(TeX("$\\hat{\\beta}_0$")) + ylab(TeX("$\\hat{\\beta}_1$")) +
-  scale_x_continuous(breaks = c(-0.1, 0.0, 0.1), labels = c("-0.1", "0.0", "0.1")) +
+  scale_x_continuous(breaks = c(-0.05, 0.05, 0.15), labels = c("-0.05", "0.05", "0.15")) +
   theme_bw() + guides(color = FALSE, alpha = FALSE, fill = FALSE) +
   geom_point(data = result.summary, mapping = aes(beta0_mean, beta1_mean), color = "black", shape = "square")
   # geom_text(data = result.summary, mapping = aes(beta0_mean + beta0_sd, beta1_mean + beta1_sd, label = sd), 
@@ -107,7 +107,7 @@ p2 <-
   ggplot(result.summary, aes(Delta, beta0_sd, col = contrast, group = contrast)) + 
   geom_point() + geom_line() + ylab(TeX("$se(\\hat{\\beta}_0)$")) + xlab("") + ylim(c(0, sd.max * 1.02)) +
   theme_bw() + guides(color = FALSE) +
-  annotate(geom = "text", x = 2, y = 0.048, label = "fixed sequences", col = "#F8766D") +
+  annotate(geom = "text", x = 2, y = 0.04, label = "fixed sequences", col = "#F8766D") +
   annotate(geom = "text", x = 3, y = 0.018, label = "stochastic sequences", col = "#00BFC4")
 
 p3 <- 
