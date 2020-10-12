@@ -121,7 +121,7 @@ dgm_binary_continuous_covariate <- function(sample_size, total_T) {
     
     # dta$S[row_index] <- sample(c(0,1,2), sample_size, replace = TRUE)
     # dta$S2[row_index] <- ifelse(dta$S[row_index] == 2, 1, 0) 
-    dta$S[row_index] <- runif(sample_size, 0, 2)
+    dta$S[row_index] <- runif(sample_size, 0, 4)
     dta$S2[row_index] <- ifelse(dta$S[row_index] > 1, 1, 0) 
     
     dta$prob_A[row_index] <- rep(prob_a, sample_size)

@@ -4,7 +4,7 @@ library(latex2exp)
 source("dgm_binary_categorical_covariate.R")
 source("estimators.R")
 
-set.seed(7)
+set.seed(4)
 control_vars <- "S"
 moderator_vars <- "S"
 delta <- 6
@@ -42,19 +42,30 @@ beta_hats <- as.data.frame(beta_hats)
 
 print(beta_hats)
 
+label_positions <- c(beta_hats$slope[1]+.04,
+                     beta_hats$slope[2]-.04,
+                     beta_hats$slope[3]+.04,
+                     beta_hats$slope[4]+.03,
+                     beta_hats$slope[5]-.03,
+                     beta_hats$slope[6]-.03)
+
 plot(beta_hats$intercept, beta_hats$slope,
      xlab = TeX("$\\hat{\\beta}_0$"),
      ylab = "",
-     ylim = c(min(beta_hats$slope)-.03, max(beta_hats$slope)+.08))
-title(main = TeX("Trajectory of $\\hat{\\beta}$"), line = 1.5)
+     ylim = c(min(beta_hats$slope)-.03, max(beta_hats$slope)+.08),
+     las = 1)
 title(ylab = TeX("$\\hat{\\beta}_1$"), line = 2.5)
 lines(beta_hats$intercept, beta_hats$slope)
-text(x = beta_hats$intercept, y = beta_hats$slope+.05, labels = c(1, 2, 3, 4, 5, 6))
+text(x = c(beta_hats$intercept[1:4], beta_hats$intercept[5]-.015, beta_hats$intercept[6]+.015), y = label_positions, labels = c(1, 2, 3, 4, 5, 6))
 
-rgl::plot3d(x = beta_hats$intercept,
-            y = beta_hats$slope, 
-            z = 1:delta, 
-            type = "s", 
-            xlab = TeX("$\\hat{\\beta}_0$"), 
-            ylab = TeX("$\\hat{\\beta}_1$"), 
-            zlab = TeX("Delta"))
+#rgl::plot3d(x = beta_hats$intercept,
+#            y = beta_hats$slope, 
+#            z = 1:delta, 
+#            type = "s", 
+#            xlab = TeX("$\\hat{\\beta}_0$"), 
+#            ylab = TeX("$\\hat{\\beta}_1$"), 
+#            zlab = TeX("Delta"))
+
+dat <- read.table(text = "1   2   3   4   5   6
+1 1.464 1.638 3.460 295 670 360  190
+2 2.536 2.362 377 255 340 615  345", header = TRUE)
