@@ -9,9 +9,6 @@ control_vars <- "S"
 moderator_vars <- "S"
 delta <- 6
 
-#dta_orig <- dgm_binary_categorical_covariate(500, 10)
-#dta_updated <- dgm_update(dta_orig)
-
 dta_orig <- dgm_binary_continuous_covariate(1000, 10)
 dta_updated <- dgm_update_continuous_covariate(dta_orig)
 
@@ -40,6 +37,8 @@ for (i in 1:delta) {
 
 beta_hats <- as.data.frame(beta_hats)
 
+### RESULT OUTPUT ###
+
 print(beta_hats)
 
 plot(beta_hats$intercept, beta_hats$slope,
@@ -50,8 +49,9 @@ plot(beta_hats$intercept, beta_hats$slope,
 title(ylab = TeX("$\\hat{\\beta}_1$"), line = 2.5)
 lines(beta_hats$intercept, beta_hats$slope)
 text(x = beta_hats$intercept,
-     y = beta_hats$slope+.05, labels = c(1, 2, 3, 4, 5, 6))
+     y = beta_hats$slope+.05, labels = 1:delta)
 
+# 3D plot of trajectory
 #rgl::plot3d(x = beta_hats$intercept,
 #            y = beta_hats$slope, 
 #            z = 1:delta, 
