@@ -1,7 +1,7 @@
 library(tidyverse)
 library(latex2exp)
 
-source("dgm_binary_categorical_covariate.R")
+source("dgm_binary_continuous_covariate.R")
 source("estimators.R")
 
 set.seed(4)

@@ -6,7 +6,7 @@ library(latex2exp)
 library(ggplot2)
 library(cowplot)
 
-source("dgm_binary_categorical_covariate.R")
+source("dgm_binary_continuous_covariate.R")
 source("estimators.R")
 
 nrep = 10
